@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "browser": {
+      "command": "node",
+      "args": ["/root/browser-mcp-template/index.js"],
+      "env": {
+        "PUPPETEER_EXECUTABLE_PATH": ""
+      }
+    }
+  }
+}

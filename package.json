@@ -1,0 +1,31 @@
+{
+  "name": "browser-mcp-server",
+  "version": "1.0.0",
+  "description": "MCP Server for browser automation - works with any LLM",
+  "type": "module",
+  "main": "index.js",
+  "bin": {
+    "browser-mcp": "./index.js"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "install-browser": "npx puppeteer browsers install chrome"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "puppeteer-core": "^23.0.0",
+    "puppeteer-extra": "^3.3.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2"
+  },
+  "peerDependencies": {
+    "puppeteer": "^23.0.0"
+  },
+  "keywords": [
+    "mcp",
+    "browser",
+    "automation",
+    "puppeteer",
+    "llm"
+  ],
+  "license": "MIT"
+}

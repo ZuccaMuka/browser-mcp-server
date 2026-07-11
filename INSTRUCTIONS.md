@@ -330,33 +330,155 @@ browser_navigate({ url: "https://bot.sannysoft.com/" })
 
 ## Подключение к запущенному браузеру
 
-### Способ 1: Chrome с debug портом
+Это самый мощный способ — подключаетесь к уже открытому Chrome с вашими куками, авторизацией и сессиями.
+
+### Зачем это нужно
+
+- Все ваши куки и авторизации уже загружены
+- Нет проблем с капчей (браузер выглядит "нормальным")
+- Можно работать с уже открытыми вкладками
+- Браузер не закрывается при отключении
+
+### Способ 1: Запуск Chrome с debug портом (рекомендуется)
+
+#### Linux / macOS
 
 ```bash
-# 1. Запустите Chrome с debug портом
+# Запустите Chrome с отладочным портом
 google-chrome --remote-debugging-port=9222
 
-# 2. Подключитесь через MCP
+# Или Chromium
+chromium --remote-debugging-port=9222
+
+# Или Firefox
+firefox --remote-debugging-port=9222
+```
+
+#### Windows
+
+```cmd
+"C:\Program Files\Google\Chrome\Application\chrome.exe" --remote-debugging-port=9222
+```
+
+#### Подключение через Claude
+
+```
+Подключись к моему браузеру на порту 9222
+```
+
+Или напрямую:
+
+```javascript
 browser_connect({ port: 9222 })
 ```
 
-### Способ 2: Через MCP
+### Способ 2: Запуск через MCP
 
 ```javascript
-// Запустить с debug портом
+// Запустить Chrome с debug портом и профилем
 browser_start_with_debug({
   browser: "chrome",
   port: 9222,
-  profile: "default"
+  profile: "default",    // использовать ваш профиль
+  headless: false         // показать окно браузера
 })
 
 // Подключиться
 browser_connect({ port: 9222 })
 ```
 
+### Способ 3: Подключение к уже запущенному Chrome
+
+Если Chrome уже открыт **без** debug порта:
+
+1. Закройте Chrome
+2. Запустите с debug портом:
+   ```bash
+   google-chrome --remote-debugging-port=9222
+   ```
+3. Подключитесь:
+   ```javascript
+   browser_connect({ port: 9222 })
+   ```
+
+### Способ 4: Через SSH туннель (удалённый доступ)
+
+Если браузер на другом сервере:
+
+```bash
+# На локальной машине - пробросить порт
+ssh -L 9222:localhost:9222 user@remote-server
+
+# Теперь подключиться
+browser_connect({ port: 9222 })
+```
+
+### Доступные порты
+
+| Порт | Описание |
+|------|----------|
+| 9222 | Стандартный debug порт Chrome |
+| 9223 | Запасной порт |
+| 9229 | Порт Node.js debugger |
+
+### Что можно делать после подключения
+
+```javascript
+// Получить список открытых вкладок
+browser_list_tabs()
+
+// Переключиться на вкладку
+browser_switch_tab({ index: 0 })
+
+// Открыть новую страницу
+browser_navigate({ url: "https://github.com" })
+
+// Работать с текущей страницей
+browser_click({ selector: ".btn" })
+browser_type({ selector: "#search", text: "query" })
+
+// Сделать скриншот
+browser_screenshot()
+
+// Получить куки
+browser_get_cookies({ url: "https://github.com" })
+```
+
 ### Важно
 
-При `browser_close()` сервер **отключается**, но **не закрывает** браузер. Вы можете продолжать работу вручную.
+- При `browser_close()` сервер **отключается**, но **НЕ закрывает** браузер
+- Вы можете продолжать работу в браузере вручную
+- Debug порт работает только на localhost (безопасность)
+- Для удалённого доступа используйте SSH туннель
+
+### Устранение проблем
+
+#### "Connection refused"
+
+```bash
+# Проверьте что debug порт открыт
+curl http://localhost:9222/json/version
+```
+
+#### "Address already in use"
+
+```bash
+# Найдите процесс на порту
+lsof -i :9222
+
+# Убейте его
+kill -9 <PID>
+```
+
+#### Chrome не запускается с debug портом
+
+```bash
+# Убедитесь что Chrome закрыт полностью
+pkill -f chrome
+
+# Запустите заново
+google-chrome --remote-debugging-port=9222
+```
 
 ---
 
